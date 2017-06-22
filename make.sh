@@ -19,25 +19,25 @@ make install
 popd
 
 
-if [ ! -z ${sim_eeros_source_dir+x} ]; then
-  mkdir -p $sim_eeros_build_dir
-  pushd $sim_eeros_build_dir
-  cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain_file \
-        -DCMAKE_INSTALL_PREFIX=$install_dir \
-	-DCMAKE_BUILD_TYPE=Release \
-	$sim_eeros_source_dir
-  make
-  make install
-  popd
-fi
-
-
+# if [ ! -z ${bbblue_eeros_source_dir+x} ]; then
+#   mkdir -p $bbblue_eeros_build_dir
+#   pushd $bbblue_eeros_build_dir
+#   cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain_file \
+#         -DADDITIONAL_INCLUDE_DIRS="/home/graf/Projects/BBB/Robotics_Cape_Installer/libraries/" \
+#         -DADDITIONAL_LINK_DIRS="/home/graf/Projects/BBB/Robotics_Cape_Installer/libraries/" \
+#         -DCMAKE_INSTALL_PREFIX=$install_dir \
+# 	-DCMAKE_BUILD_TYPE=Release \
+# 	$bbblue_eeros_source_dir
+#   make
+#   make install
+#   popd
+# fi
 if [ ! -z ${bbblue_eeros_source_dir+x} ]; then
   mkdir -p $bbblue_eeros_build_dir
   pushd $bbblue_eeros_build_dir
   cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain_file \
-        -DADDITIONAL_INCLUDE_DIRS="/home/graf/Projects/BBB/Robotics_Cape_Installer/libraries/" \
-        -DADDITIONAL_LINK_DIRS="/home/graf/Projects/BBB/Robotics_Cape_Installer/libraries/" \
+        -DADDITIONAL_INCLUDE_DIRS="$roboticscape_dir/libraries/" \
+        -DADDITIONAL_LINK_DIRS="$roboticscape_dir/libraries/" \
         -DCMAKE_INSTALL_PREFIX=$install_dir \
 	-DCMAKE_BUILD_TYPE=Release \
 	$bbblue_eeros_source_dir

@@ -7,6 +7,8 @@ toolchain_file="$wd/arm-linux-gnueabihf.cmake"         # build for arm
 install_dir="$wd/install-armhf"
 build_dir="$wd/build-armhf"
 
+roboticscape_dir=$wd/robotics_cape_installer
+
 eeros_source_dir="$wd/eeros"
 eeros_build_dir="$build_dir/eeros"
 
