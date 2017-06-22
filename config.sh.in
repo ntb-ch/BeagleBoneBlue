@@ -1,0 +1,18 @@
+wd="$(pwd)"
+
+# choose a suitable toolchain file for your intended platform
+toolchain_file="$wd/arm-linux-gnueabihf.cmake"         # build for arm 
+
+# choose a name for build and install directory
+install_dir="$wd/install-armhf"
+build_dir="$wd/build-armhf"
+
+eeros_source_dir="$wd/eeros"
+eeros_build_dir="$build_dir/eeros"
+
+bbblue_eeros_source_dir="$wd/bbblue-eeros"
+bbblue_eeros_build_dir="$build_dir/bbblue-eeros"
+
+application_source_dir="$wd/myApp"
+application_build_dir="$build_dir/myApp"
+
