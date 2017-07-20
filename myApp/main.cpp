@@ -11,6 +11,7 @@
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
 #include <signal.h>
+#include <unistd.h>
 
 using namespace eeros;
 using namespace eeros::safety;
@@ -89,13 +90,6 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, char **argv){
-	signal(SIGHUP, signalHandler);
-	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
-
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
@@ -103,6 +97,16 @@ int main(int argc, char **argv){
 	log.info() << "MyApp started... ";
 		
 	HAL::instance().readConfigFromFile(&argc, argv);
+	
+	// signal handlers can be installed only after the 
+	// robotics cape is initialized by the HAL !
+	signal(SIGHUP, signalHandler);
+	signal(SIGINT, signalHandler);
+	signal(SIGQUIT, signalHandler);
+	signal(SIGKILL, signalHandler);
+	signal(SIGTERM, signalHandler);
+	signal(SIGPWR, signalHandler);
+	
 	eeros::hal::Output<bool>* led = HAL::instance().getLogicOutput("led1");
 	bool toggle;
 	ControlSystem controlSystem;
