@@ -100,12 +100,7 @@ int main(int argc, char **argv){
 	
 	// signal handlers can be installed only after the 
 	// robotics cape is initialized by the HAL !
-	signal(SIGHUP, signalHandler);
 	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
 	
 	eeros::hal::Output<bool>* led = HAL::instance().getLogicOutput("led1");
 	bool toggle;
@@ -125,7 +120,7 @@ int main(int argc, char **argv){
 	td.addBlock(controlSystem.led2);
 	td.addBlock(controlSystem.m1);
 	td.addBlock(controlSystem.enc1);
-	controlSystem.sw.registerSafetyEvent(&safetySys, &ssProperties.seGoto2);
+	controlSystem.sw.registerSafetyEvent(safetySys, ssProperties.seGoto2);
 	
 	// create periodic function for logging
 	Lambda l1 ([&] () { });
