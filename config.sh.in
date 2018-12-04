@@ -1,9 +1,25 @@
 wd="$(pwd)"
 
-# choose a suitable toolchain file for your intended platform
-toolchain_file="$wd/arm-linux-gnueabihf.cmake"         # build for arm 
 
-# choose a name for build and install directory
+# variables for clone.sh (location and version of the sources)
+
+roboticscape_github_address=https://github.com/StrawsonDesign/librobotcontrol.git
+roboticscape_github_version=v0.3.4
+roboticscape_required_version=${roboticscape_github_version:start+1}
+
+eeros_github_address=https://github.com/andreaskunz/eeros-framework.git
+eeros_github_version=v0.6.0
+eeros_required_version=${eeros_github_version:start+1}
+
+bbb_eeros_github_address=https://github.com/andreaskunz/bbblue-eeros.git
+bbb_eeros_github_version=master
+bbb_eeros_required_version=0.1.0
+
+
+# variables for make.sh
+
+toolchain_file="$wd/arm-linux-gnueabihf.cmake"
+
 install_dir="$wd/install-armhf"
 build_dir="$wd/build-armhf"
 
@@ -18,3 +34,8 @@ bbblue_eeros_build_dir="$build_dir/bbblue-eeros"
 application_source_dir="$wd/myApp"
 application_build_dir="$build_dir/myApp"
 
+
+# variables for deploy.sh
+target_IP_address=192.168.7.2
+target_username=debian
+target_application_folder=/opt/eeros/

@@ -5,22 +5,25 @@ script_dir="$(dirname $script)"
 
 . "$script_dir/config.sh.in"
 
-git clone https://github.com/StrawsonDesign/Robotics_Cape_Installer.git -o upstream "$roboticscape_dir"
+git clone $roboticscape_github_address -o upstream "$roboticscape_dir"
 pushd "$roboticscape_dir"
-git checkout master
+git checkout $roboticscape_github_version
 popd
 
 
 if [ ! -d "$eeros_source_dir" ]; then
-	git clone https://github.com/eeros-project/eeros-framework.git -o upstream "$eeros_source_dir"
+	git clone $eeros_github_address -o upstream "$eeros_source_dir"
 	pushd "$eeros_source_dir"
-	git checkout master
+	git checkout $eeros_github_version
 	popd
 fi
 
 
 if [ ! -z ${bbblue_eeros_source_dir+y} ]; then
 	if [ ! -d "$bbblue_eeros_source_dir" ]; then
-		git clone https://github.com/eeros-project/bbblue-eeros.git -o upstream "$bbblue_eeros_source_dir"
+		git clone $bbb_eeros_github_address -o upstream "$bbblue_eeros_source_dir"
+		pushd $bbblue_eeros_source_dir
+		git checkout $bbb_eeros_github_version
+		popd
 	fi
 fi

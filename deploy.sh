@@ -1,6 +1,12 @@
 #!/bin/bash
 
-target="debian@192.168.7.2:/opt/eeros/"
+script="$(readlink -f $0)"
+script_dir="$(dirname $script)"
+
+. "$script_dir/config.sh.in"
+
+
+target=${target_username}@${target_IP_address}:${target_application_folder}
 list="deploy.txt"
 tmp=".tmp-deploy"
 
@@ -49,10 +55,10 @@ do
 	fi
 done < "$list"
 
+echo "scp with: $target"
 scp -r $tmp/tmp/* $target
 if [ $? -eq 0 ]; then
 	cp -r $tmp/tmp/* $tmp
 fi
 
 rm -rf $tmp/tmp
-
