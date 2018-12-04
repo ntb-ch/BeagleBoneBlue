@@ -1,143 +1,145 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/safety/SafetySystem.hpp>
 #include <eeros/control/TimeDomain.hpp>
-#include <eeros/core/Executor.hpp>
-#include <eeros/control/Constant.hpp>
-#include <eeros/control/I.hpp>
-#include <eeros/control/Switch.hpp>
-#include <eeros/task/Lambda.hpp>
-#include <eeros/hal/HAL.hpp>
-#include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
+#include <eeros/control/PeripheralOutput.hpp>
+#include <eeros/control/Constant.hpp>
+#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/task/Lambda.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/hal/HAL.hpp>
+
 #include <signal.h>
-#include <unistd.h>
 
-using namespace eeros;
-using namespace eeros::safety;
-using namespace eeros::logger;
-using namespace eeros::control;
-using namespace eeros::task;
-using namespace eeros::hal;
+/**
+ * This example sets a constant value to a PeripheralOutput and
+ * logs a PeripheralInput periodically.
+ * It was primarily written to run on a target system which has a
+ * motor with an encoder connected to it (for example the beaglebone Blue).
+ * Make sure to write a valid hardware config file and run the
+ * executable with the path to the hw config file as an argument:
+ *   sudo ./myApp -c HwConfigBBBlue.json
+ * An example hw config file can be found here:
+ * https://github.com/ntb-ch/BeagleBoneBlue/blob/master/myApp/HwConfigBBBlue.json
+ */
 
-double period = 0.1;
 
-class ControlSystem {
-public:
-	ControlSystem() : c1(0.1), c2(-0.8), sw(0), led2("led2"), b2("button2"), m1("motor1"), enc1("enc1") {
-		i.getIn().connect(c1.getOut());
-		i.setInitCondition(0);
-		i.enable();
-		sw.getIn(0).connect(i.getOut());
-		sw.getIn(1).connect(c2.getOut());
-		sw.getOut().getSignal().setName("switch output");
-		led2.getIn().connect(b2.getOut());
-		m1.getIn().connect(sw.getOut());
-	}
+class MotorControlSystem {
+  public:
+    MotorControlSystem(eeros::control::TimeDomain& td):
+    enc1{"enc1"},
+    motor1{"motor1"},
+    const1{1.0}
+    {
+      motor1.getIn().connect(const1.getOut());
 
-	Constant<> c1, c2;
-	Switch<> sw;
-	I<> i;
-	PeripheralInput<bool> b2;
-	PeripheralInput<double> enc1;
-	PeripheralOutput<bool> led2;
-	PeripheralOutput<double> m1;
+      td.addBlock(enc1);
+      td.addBlock(const1);
+      td.addBlock(motor1);
+    };
+
+
+    eeros::control::Signal<double>& getEncoderSignal(){
+      return enc1.getOut().getSignal();
+    }
+
+ 
+  private:
+    eeros::control::PeripheralInput<double> enc1;
+    eeros::control::PeripheralOutput<double> motor1;
+    eeros::control::Constant<double> const1;
 };
 
-class SafetyPropertiesTest : public SafetyProperties {
-public:
-	SafetyPropertiesTest(ControlSystem& cs) : 
-		slState1("state 1"), slState2("state 2"), 
-		seGoto1("switch to state 1"), seGoto2("switch to state 2"), 
-		cs(cs) {
-			
-		// ############ Add levels ############
-		addLevel(slState1);
-		addLevel(slState2);
-		
-		// ############ Add events to the levels ############
-		slState1.addEvent(seGoto2, slState2, kPublicEvent);
-		slState2.addEvent(seGoto1, slState1, kPrivateEvent);
-		
-		// Define and add level functions
-		slState1.setLevelAction([&](SafetyContext* privateContext) {
-			if(slState1.getNofActivations() == 1) {
-				cs.i.setInitCondition(0);
-				cs.sw.switchToInput(0);
-				cs.sw.setCondition(0.6, 0.05, 1);
-				cs.sw.arm();
-			}
-		});
-		
-		slState2.setLevelAction([&](SafetyContext* privateContext) {
-			if(slState2.getNofActivations() * period > 3) {
-				cs.sw.switchToInput(0);
-				cs.i.setInitCondition(0);
-				privateContext->triggerEvent(seGoto1);
-			}
-		});
-		
-		// Define entry level
-		setEntryLevel(slState1);	
-	};
-	SafetyLevel slState1, slState2;
-	SafetyEvent seGoto1, seGoto2;
-	ControlSystem& cs;
+
+
+class MySafetyProperties : public eeros::safety::SafetyProperties {
+  public:
+    MySafetyProperties(eeros::logger::Logger& loggerRef):
+    slRun{"Safety Level RUN"},
+    slStop{"Safety Level STOP"},
+    seRun{"Goto SL RUN"},
+    seStop{"Goto SL STOP"},
+    log{loggerRef}
+    {
+      addLevel(slRun);
+      addLevel(slStop);
+
+      slRun.addEvent(seStop, slStop);
+      slStop.addEvent(seRun, slRun);
+
+      setEntryLevel(slRun);
+    }
+
+  private:
+    eeros::safety::SafetyLevel slRun, slStop;
+    eeros::safety::SafetyEvent seRun, seStop;
+    eeros::logger::Logger& log;
 };
+
 
 void signalHandler(int signum) {
-	Executor::stop();
+  eeros::safety::SafetySystem::exitHandler();
+  eeros::Executor::stop();
 }
 
-int main(int argc, char **argv){
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
-	
-	log.info() << "MyApp started... ";
-		
-	HAL::instance().readConfigFromFile(&argc, argv);
-	
-	// signal handlers can be installed only after the 
-	// robotics cape is initialized by the HAL !
-	signal(SIGINT, signalHandler);
-	
-	eeros::hal::Output<bool>* led = HAL::instance().getLogicOutput("led1");
-	bool toggle;
-	ControlSystem controlSystem;
 
-	// Create and initialize safety system
-	SafetyPropertiesTest ssProperties(controlSystem);
-	SafetySystem safetySys(ssProperties, period);
-	
-	// create time domain and add blocks of control system
-	TimeDomain td("td1", period, true);
-	td.addBlock(controlSystem.c1);
-	td.addBlock(controlSystem.c2);
-	td.addBlock(controlSystem.i);
-	td.addBlock(controlSystem.sw);
-	td.addBlock(controlSystem.b2);
-	td.addBlock(controlSystem.led2);
-	td.addBlock(controlSystem.m1);
-	td.addBlock(controlSystem.enc1);
-	controlSystem.sw.registerSafetyEvent(safetySys, ssProperties.seGoto2);
-	
-	// create periodic function for logging
-	Lambda l1 ([&] () { });
-	Periodic periodic("per1", 0.5, l1);
-	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-		log.info() << controlSystem.sw.getOut().getSignal();
-		log.info() << controlSystem.enc1.getOut().getSignal();
-		led->set(toggle);
-		toggle = !toggle;
-	});
-	
-	// Create and run executor
-	auto& executor = eeros::Executor::instance();
-	executor.setMainTask(safetySys);
-	executor.add(td);
-	executor.add(periodic);
-	executor.run();
+int main(int argc, char **argv) {
+  using namespace eeros;
+  using namespace eeros::logger;
+  using namespace eeros::control;
+  using namespace eeros::task;
+  using namespace eeros::hal;
+  using namespace eeros::safety;
 
-	log.info() << "Test finished...";
+  double period{0.1};
+
+  StreamLogWriter streamWriter{std::cout};
+  Logger::setDefaultWriter(&streamWriter);
+  Logger log{};
+
+  log.info() << "MotorControlSystem started.";
+
+  HAL::instance().readConfigFromFile(&argc, argv);
+
+  signal(SIGINT, signalHandler);
+
+  MySafetyProperties safetyProperties{log};
+  SafetySystem safetySystem{safetyProperties, period};
+
+  TimeDomain td{"timeDomain", period, true};
+  MotorControlSystem motorCS{td};
+
+  int cycleCounter{};
+  bool success{false};
+
+  Lambda lambdafunc{[&](){
+    log.info() << "encoder counts: " << motorCS.getEncoderSignal();
+
+    if(motorCS.getEncoderSignal().getValue() > 31.42){ // 5*2PI
+       eeros::Executor::stop();
+       success = true;
+    }else {
+      cycleCounter++;
+    }
+
+    if(cycleCounter > 100) { //100*0.2s = 20s
+       log.error() << "timeout.";
+       eeros::Executor::stop();
+    }
+  }};
+
+  Periodic periodic{"periodic", 0.2, lambdafunc};
+
+  auto& executor = eeros::Executor::instance();
+  executor.setMainTask(safetySystem);
+  executor.add(td);
+  executor.add(periodic);
+  executor.run(); // blocking call
+
+  if(!success) {
+   log.error() << "failed.";
+   return -1;
+  }
+
+  log.info() << "Application terminated with success.";
 }

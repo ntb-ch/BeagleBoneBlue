@@ -77,7 +77,7 @@
 				"signalId": "enc1",
 				"scale": [ { "id" : "fqd",
 							"minIn": 	0, "maxIn": 6.283185307,
-							"minOut":	0, "maxOut": 450600 }
+							"minOut":	0, "maxOut": 4200 }
 					 ],
 				"range": [ { "id" : "fqd",
 							"noLimit": 	true }
