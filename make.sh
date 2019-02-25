@@ -24,8 +24,8 @@ if [ ! -z ${bbblue_eeros_source_dir+x} ]; then
         -DADDITIONAL_INCLUDE_DIRS="$roboticscape_dir/libraries/" \
         -DADDITIONAL_LINK_DIRS="$roboticscape_dir/libraries/" \
         -DCMAKE_INSTALL_PREFIX=$install_dir \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DREQUIRED_EEROS_VERSION=$eeros_required_version \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DREQUIRED_EEROS_VERSION=$eeros_required_version \
 	$bbblue_eeros_source_dir
   make
   make install
@@ -36,10 +36,11 @@ fi
 mkdir -p $application_build_dir
 pushd $application_build_dir
 cmake	-DCMAKE_TOOLCHAIN_FILE=$toolchain_file \
-        -DADDITIONAL_INCLUDE_DIRS="$roboticscape_dir/libraries/" \
-        -DADDITIONAL_LINK_DIRS="$roboticscape_dir/libraries/" \
-        -DCMAKE_INSTALL_PREFIX=$install_dir \
-	-DCMAKE_BUILD_TYPE=Release \
+      -DADDITIONAL_INCLUDE_DIRS="$roboticscape_dir/libraries/" \
+      -DADDITIONAL_LINK_DIRS="$roboticscape_dir/libraries/" \
+      -DCMAKE_INSTALL_PREFIX=$install_dir \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DREQUIRED_EEROS_VERSION=$eeros_required_version \
 	$application_source_dir
 make
 popd
