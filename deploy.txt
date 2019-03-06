@@ -1,5 +1,5 @@
-install-armhf/lib/libeeros.so.0.6.0.0
-install-armhf/lib/libbbblueeeros.so.0.1.0
+install-armhf/lib/libeeros.so.1.0.0.0
+install-armhf/lib/libbbblueeeros.so.1.0.0.0
 
 myApp/HwConfigBBBlue.json
 build-armhf/myApp/myApp
