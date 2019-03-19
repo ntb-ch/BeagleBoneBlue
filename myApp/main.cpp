@@ -12,15 +12,8 @@
 #include <signal.h>
 
 /**
- * This example sets a constant value to a PeripheralOutput and
- * logs a PeripheralInput periodically.
- * It was primarily written to run on a target system which has a
- * motor with an encoder connected to it (for example the beaglebone Blue).
- * Make sure to write a valid hardware config file and run the
- * executable with the path to the hw config file as an argument:
- *   sudo ./myApp -c HwConfigBBBlue.json
- * An example hw config file can be found here:
- * https://github.com/ntb-ch/BeagleBoneBlue/blob/master/myApp/HwConfigBBBlue.json
+ * This example sets a constant value to a PeripheralOutput (a motor) and
+ * logs a PeripheralInput (an encoder) periodically.
  */
 
 
@@ -137,8 +130,8 @@ int main(int argc, char **argv) {
   executor.run(); // blocking call
 
   if(!success) {
-   log.error() << "failed.";
-   return -1;
+   log.error() << "failed. Exit with status 1.";
+   return 1;
   }
 
   log.info() << "Application terminated with success.";
