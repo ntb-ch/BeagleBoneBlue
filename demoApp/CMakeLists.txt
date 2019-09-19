@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(myApp)
+project(demo)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -26,5 +26,5 @@ find_package(EEROS ${REQUIRED_EEROS_VERSION} REQUIRED)
 include_directories(${EEROS_INCLUDE_DIR};${EEROS_LIBUCL_INCLUDE_DIR};${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR};${ADDITIONAL_LINK_DIRS})
 
-add_executable(myApp main.cpp)
-target_link_libraries(myApp eeros ${CMAKE_DL_LIBS} ucl)
+add_executable(demo main.cpp)
+target_link_libraries(demo eeros ${CMAKE_DL_LIBS} ucl)
