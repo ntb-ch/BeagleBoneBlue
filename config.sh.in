@@ -56,8 +56,8 @@ eeros_build_dir="$build_dir/eeros"
 bbblue_eeros_source_dir="$wd/bbblue-eeros"
 bbblue_eeros_build_dir="$build_dir/bbblue-eeros"
 
-application_source_dir="$wd/myApp"
-application_build_dir="$build_dir/myApp"
+application_source_dir="$wd/demoApp"
+application_build_dir="$build_dir/demoApp"
 
 
 
