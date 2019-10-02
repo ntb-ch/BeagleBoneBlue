@@ -41,6 +41,7 @@ cmake	-DCMAKE_TOOLCHAIN_FILE=$toolchain_file \
       -DCMAKE_INSTALL_PREFIX=$install_dir \
       -DCMAKE_BUILD_TYPE=Release \
       -DREQUIRED_EEROS_VERSION=$eeros_required_version \
+      -DREQUIRED_BBB_EEROS_VERSION=$bbb_eeros_required_version \
 	$application_source_dir
 make
 popd

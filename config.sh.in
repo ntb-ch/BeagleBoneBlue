@@ -27,7 +27,8 @@ eeros_github_version=v1.0.0
 eeros_required_version=1.0.0.0
 
 bbb_eeros_github_address=https://github.com/eeros-project/bbblue-eeros.git
-bbb_eeros_github_version=v1.0.0
+bbb_eeros_github_version=v1.1.0
+bbb_eeros_required_version=1.1.0.0
 
 
 
