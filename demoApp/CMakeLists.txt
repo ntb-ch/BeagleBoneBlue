@@ -24,7 +24,7 @@ checkIfModuleFound("EEROS" "REQUIRED_EEROS_VERSION")
 
 # Find bbb-eeros
 setVersionToFind("bbblue-eeros" "REQUIRED_BBB_EEROS_VERSION" ${RECOMMENDED_BBB_EEROS_VERSION} ${REQUIRED_BBB_EEROS_VERSION})
-find_package(bbb-eeros ${VERSION_TO_FIND} EXACT)
+find_package(bbblue-eeros ${VERSION_TO_FIND} EXACT)
 checkIfModuleFound("bbblue-eeros" "REQUIRED_BBB_EEROS_VERSION")
 
 
