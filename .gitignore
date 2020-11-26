@@ -1,9 +1,0 @@
-.kdev4/
-*.kdev4
-.directory
-.tmp-deploy
-bbblue-eeros
-build*
-install*
-eeros
-robotics_cape*
