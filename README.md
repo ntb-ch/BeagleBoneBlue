@@ -6,4 +6,4 @@ Contains a complete hardware description file for EEROS applications.
 
 ## Getting started with EEROS on the BeagleBone® Blue
 
-See [step-by-step procedure](https://wiki.eeros.org/getting_started) to set up an EEROS project. 
+See [Get Started Using EEROS](https://wiki.eeros.org/getting_started/start) to set up an EEROS project. 
